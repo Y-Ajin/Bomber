@@ -19,22 +19,28 @@ namespace Bomber
             string result = "";
             HttpWebResponse response = null;
             StreamReader r = null;
-            CookieContainer cc = new CookieContainer();
 
             try
             {
+                Console.WriteLine(http.Url);
+                ServicePointManager.ServerCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
+
                 var request = (HttpWebRequest)WebRequest.Create(http.Url);
 
                 request.Method = http.Method;
-                request.CookieContainer = cc;
+                request.CookieContainer = new CookieContainer();
                 request.AllowAutoRedirect = true;
-                request.Credentials = CredentialCache.DefaultNetworkCredentials;
+                request.Credentials = CredentialCache.DefaultCredentials;
                 if (proxy != null)
                     request.Proxy = new WebProxy(proxy);
 
                 foreach (var h in http.Headers)
                 {
-                    if (h.Key.Equals("Content-Type", StringComparison.CurrentCultureIgnoreCase))
+                    if (h.Key.Equals("Host", StringComparison.CurrentCultureIgnoreCase))
+                        request.Host = h.Value;
+                    else if (h.Key.Equals("Connection", StringComparison.CurrentCultureIgnoreCase))
+                        request.KeepAlive = true;
+                    else if (h.Key.Equals("Content-Type", StringComparison.CurrentCultureIgnoreCase))
                         request.ContentType = h.Value;
                     else if (h.Key.Equals("User-Agent", StringComparison.CurrentCultureIgnoreCase))
                         request.UserAgent = h.Value;

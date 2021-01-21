@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
 using System.IO;
@@ -43,7 +44,7 @@ namespace Bomber
                 string ConvertTo(string str)
                 {
                     string result = "";
-                    str = str.Replace("{", "").Replace("}", "");
+                    str = str.Replace("{", "").Replace("}", "").Replace("'", "\"");
                     var parr = str.Split(',');
                     for (int i = 0; i < parr.Length; i++)
                     {
@@ -53,34 +54,10 @@ namespace Bomber
                             continue;
                         }
                         result += i == 0 ? "" : "&";
-                        result += kv[0].Replace("\"", "") + "=" + (kv.Length > 1 ? kv[1].Trim() : "");
+                        result += kv[0].Replace("\"", "").Trim() + "=" + (kv.Length > 1 ? kv[1].Replace("\"", "").Trim() : "");
                     }
                     return result;
                 }
-
-                void SetData(string str)
-                {
-                    if (str.Contains("params"))
-                    {
-                        var p = str.Substring(str.IndexOf("=") + 1).Replace(")", "").Replace('\'', '"');
-                        urlp = ConvertTo(p);
-                    }
-                    else if (str.Contains("data"))
-                    {
-                        var d = str.Substring(str.IndexOf("=") + 1).Replace(")", "").Replace('\'', '"');
-                        data = ConvertTo(d);
-                    }
-                    else if (str.Contains("json"))
-                    {
-                        var j = str.Substring(str.IndexOf("=") + 1).Replace(")", "").Replace('\'', '"');
-                        json = j;
-                    }
-                    else if (str.Contains("delay"))
-                    {
-                        var d = str.Substring(str.IndexOf("=") + 1).Replace(")", "").Replace('\'', '"');
-                        delay = Convert.ToSingle(d);
-                    }
-                };
 
                 while ((line = sr.ReadLine()) != null)
                 {
@@ -99,13 +76,19 @@ namespace Bomber
                     {
                         if (line.Contains("return"))
                         {
-                            var arr = line.Split(',');
+                            var arr = line.Split(new char[] { ',' }, 5);
 
                             method = arr[1].Replace("'", "").Replace("\"", "").Trim();
                             url = arr[2].Replace("'", "").Replace("\"", "").Trim();
 
-                            for (int i = 4; i < arr.Length; i++)
-                                SetData(arr[i]);
+                            Console.WriteLine(arr[4]);
+                            var pattern = "(?:params=({[^}]*}))?(?:,(?: )?)?(?:data=({[^}]*}))?(?:,(?: )?)?(?:json=({[^}]*}))?(?:,(?: )?)?(?:delay=([0-9.]+))?";
+                            var groups = Regex.Match(arr[4].Replace(")", "").Trim(), pattern).Groups;
+                            Console.WriteLine(groups[0]);
+                            urlp = ConvertTo(groups[1].Value);
+                            data = ConvertTo(groups[2].Value);
+                            json = groups[3].Value;
+                            delay = groups[4].Value == "" ? 0f : Convert.ToSingle(groups[4].Value);
 
                             if (urlp != "")
                             {
@@ -137,7 +120,7 @@ namespace Bomber
                             if (line.Contains("headers") || line.Contains("''')"))
                                 continue;
                             var key = line.Substring(0, line.IndexOf(":")).Trim();
-                            if (key == "Host" || key == "Connection" || key == "Content-Length") continue;
+                            if (key == "Content-Length") continue;
                             headers[key] = line.Substring(line.IndexOf(":") + 1).Trim();
                         }
                     }
@@ -418,7 +401,7 @@ namespace Bomber
             th.Start();
         }
 
-        private void Refresh_Click(object sender, EventArgs e)
+        private void RefreshBullets_Click(object sender, EventArgs e)
         {
             LoadBullets();
         }

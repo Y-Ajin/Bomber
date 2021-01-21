@@ -51,7 +51,7 @@ namespace Bomber
             this.ReverseSelect = new System.Windows.Forms.Button();
             this.TestProxy = new System.Windows.Forms.Button();
             this.ProxyEnabled = new System.Windows.Forms.CheckBox();
-            this.Refresh = new System.Windows.Forms.Button();
+            this.RefreshBullets = new System.Windows.Forms.Button();
             this.Data.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -169,7 +169,7 @@ namespace Bomber
             this.Proxy.BackColor = System.Drawing.Color.DarkCyan;
             this.Proxy.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.Proxy.ForeColor = System.Drawing.SystemColors.HighlightText;
-            this.Proxy.Location = new System.Drawing.Point(95, 169);
+            this.Proxy.Location = new System.Drawing.Point(95, 174);
             this.Proxy.Name = "Proxy";
             this.Proxy.Size = new System.Drawing.Size(69, 20);
             this.Proxy.TabIndex = 8;
@@ -258,24 +258,24 @@ namespace Bomber
             this.ProxyEnabled.Text = "使用";
             this.ProxyEnabled.UseVisualStyleBackColor = true;
             // 
-            // Refresh
+            // RefreshBullets
             // 
-            this.Refresh.BackColor = System.Drawing.Color.SandyBrown;
-            this.Refresh.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.Refresh.ForeColor = System.Drawing.SystemColors.HighlightText;
-            this.Refresh.Location = new System.Drawing.Point(717, 341);
-            this.Refresh.Name = "Refresh";
-            this.Refresh.Size = new System.Drawing.Size(58, 28);
-            this.Refresh.TabIndex = 16;
-            this.Refresh.Text = "刷新";
-            this.Refresh.UseVisualStyleBackColor = false;
-            this.Refresh.Click += new System.EventHandler(this.Refresh_Click);
+            this.RefreshBullets.BackColor = System.Drawing.Color.SandyBrown;
+            this.RefreshBullets.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.RefreshBullets.ForeColor = System.Drawing.SystemColors.HighlightText;
+            this.RefreshBullets.Location = new System.Drawing.Point(717, 341);
+            this.RefreshBullets.Name = "RefreshBullets";
+            this.RefreshBullets.Size = new System.Drawing.Size(58, 28);
+            this.RefreshBullets.TabIndex = 16;
+            this.RefreshBullets.Text = "刷新";
+            this.RefreshBullets.UseVisualStyleBackColor = false;
+            this.RefreshBullets.Click += new System.EventHandler(this.RefreshBullets_Click);
             // 
             // Main
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(800, 419);
-            this.Controls.Add(this.Refresh);
+            this.Controls.Add(this.RefreshBullets);
             this.Controls.Add(this.ProxyEnabled);
             this.Controls.Add(this.TestProxy);
             this.Controls.Add(this.ReverseSelect);
@@ -319,7 +319,7 @@ namespace Bomber
         private Button Stop;
         private Button TestProxy;
         private CheckBox ProxyEnabled;
-        private Button Refresh;
+        private Button RefreshBullets;
     }
 }
 
