@@ -25,9 +25,8 @@ namespace Bomber
             InitializeComponent();
         }
 
-        private void Main_Load(object sender, EventArgs e)
+        private void LoadBullets()
         {
-            #region Load Bullets
             Https = new Dictionary<string, Http>();
             using (StreamReader sr = new StreamReader("bullet_list.py"))
             {
@@ -110,7 +109,7 @@ namespace Bomber
 
                             if (urlp != "")
                             {
-                                url += urlp;
+                                url += "?" + urlp;
                             }
 
                             var name = start.Split('(')[0].Substring(start.IndexOf(" ") + 1);
@@ -119,7 +118,7 @@ namespace Bomber
                             http.Method = method;
                             http.Url = url;
                             http.Headers = headers;
-                            http.PostData = data != "" ? data : json;
+                            http.Data = data != "" ? data : json;
                             http.Delay = delay;
 
                             Https[name] = http;
@@ -145,11 +144,16 @@ namespace Bomber
                 }
             }
 
+            Bullets.Items.Clear();
             foreach (var http in Https)
             {
                 Bullets.Items.Add(http.Key, true);
             }
-            #endregion
+        }
+
+        private void Main_Load(object sender, EventArgs e)
+        {
+            LoadBullets();
             #region Load Config
             if (File.Exists("Config.xml"))
             {
@@ -276,7 +280,7 @@ namespace Bomber
                     http.Method = Https[key].Method;
                     http.Url = Https[key].Url.Replace("=target", "=" + phone);
                     http.Headers = Https[key].Headers;
-                    http.PostData = Https[key].PostData.Replace("target", phone);
+                    http.Data = Https[key].Data.Replace("target", phone);
                     http.Delay = Https[key].Delay;
                     https[key] = http;
                 }
@@ -412,6 +416,11 @@ namespace Bomber
             });
             th.Name = "TestProxy";
             th.Start();
+        }
+
+        private void Refresh_Click(object sender, EventArgs e)
+        {
+            LoadBullets();
         }
     }
 }

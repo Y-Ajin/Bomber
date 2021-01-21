@@ -11,7 +11,7 @@ namespace Bomber
         public string Method { get; set; }
         public string Url { get; set; }
         public Dictionary<string, string> Headers { get; set; }
-        public string PostData { get; set; }
+        public string Data { get; set; }
         public float Delay { get; set; }
 
         public static string Request(Http http, string proxy = null)
@@ -27,26 +27,28 @@ namespace Bomber
 
                 request.Method = http.Method;
                 request.CookieContainer = cc;
+                request.AllowAutoRedirect = true;
+                request.Credentials = CredentialCache.DefaultNetworkCredentials;
                 if (proxy != null)
                     request.Proxy = new WebProxy(proxy);
 
                 foreach (var h in http.Headers)
                 {
-                    if (h.Key == "Content-Type")
+                    if (h.Key.Equals("Content-Type", StringComparison.CurrentCultureIgnoreCase))
                         request.ContentType = h.Value;
-                    else if (h.Key == "User-Agent")
+                    else if (h.Key.Equals("User-Agent", StringComparison.CurrentCultureIgnoreCase))
                         request.UserAgent = h.Value;
-                    else if (h.Key == "Accept")
+                    else if (h.Key.Equals("Accept", StringComparison.CurrentCultureIgnoreCase))
                         request.Accept = h.Value;
-                    else if (h.Key == "Referer")
+                    else if (h.Key.Equals("Referer", StringComparison.CurrentCultureIgnoreCase))
                         request.Referer = h.Value;
                     else
                         request.Headers.Set(h.Key, h.Value);
                 }
 
-                if (request.Method == "POST")
+                if (request.Method != "GET")
                 {
-                    var d = Encoding.UTF8.GetBytes(http.PostData);
+                    var d = Encoding.UTF8.GetBytes(http.Data);
                     request.ContentLength = d.Length;
 
                     Stream s = request.GetRequestStream();

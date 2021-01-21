@@ -40,6 +40,7 @@ namespace Bomber
             this.DelayValue = new System.Windows.Forms.TextBox();
             this.Delay = new System.Windows.Forms.Label();
             this.Data = new System.Windows.Forms.Panel();
+            this.Stop = new System.Windows.Forms.Button();
             this.Start = new System.Windows.Forms.Button();
             this.Proxy = new System.Windows.Forms.Label();
             this.ProxyValue = new System.Windows.Forms.RichTextBox();
@@ -48,9 +49,9 @@ namespace Bomber
             this.Bullets = new System.Windows.Forms.CheckedListBox();
             this.AllSelect = new System.Windows.Forms.Button();
             this.ReverseSelect = new System.Windows.Forms.Button();
-            this.Stop = new System.Windows.Forms.Button();
             this.TestProxy = new System.Windows.Forms.Button();
             this.ProxyEnabled = new System.Windows.Forms.CheckBox();
+            this.Refresh = new System.Windows.Forms.Button();
             this.Data.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -128,6 +129,23 @@ namespace Bomber
             this.Data.Size = new System.Drawing.Size(241, 148);
             this.Data.TabIndex = 6;
             // 
+            // Stop
+            // 
+            this.Stop.BackColor = System.Drawing.Color.DarkRed;
+            this.Stop.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.Stop.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(128)))));
+            this.Stop.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Aqua;
+            this.Stop.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.Stop.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.Stop.Location = new System.Drawing.Point(157, 109);
+            this.Stop.Margin = new System.Windows.Forms.Padding(4);
+            this.Stop.Name = "Stop";
+            this.Stop.Size = new System.Drawing.Size(67, 29);
+            this.Stop.TabIndex = 7;
+            this.Stop.Text = "停止";
+            this.Stop.UseVisualStyleBackColor = false;
+            this.Stop.Click += new System.EventHandler(this.Stop_Click);
+            // 
             // Start
             // 
             this.Start.BackColor = System.Drawing.SystemColors.Highlight;
@@ -187,7 +205,7 @@ namespace Bomber
             this.Bullets.FormattingEnabled = true;
             this.Bullets.Location = new System.Drawing.Point(653, 13);
             this.Bullets.Name = "Bullets";
-            this.Bullets.Size = new System.Drawing.Size(135, 356);
+            this.Bullets.Size = new System.Drawing.Size(135, 312);
             this.Bullets.TabIndex = 11;
             // 
             // AllSelect
@@ -195,7 +213,7 @@ namespace Bomber
             this.AllSelect.BackColor = System.Drawing.Color.SandyBrown;
             this.AllSelect.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.AllSelect.ForeColor = System.Drawing.SystemColors.HighlightText;
-            this.AllSelect.Location = new System.Drawing.Point(653, 375);
+            this.AllSelect.Location = new System.Drawing.Point(653, 341);
             this.AllSelect.Name = "AllSelect";
             this.AllSelect.Size = new System.Drawing.Size(58, 28);
             this.AllSelect.TabIndex = 12;
@@ -208,30 +226,13 @@ namespace Bomber
             this.ReverseSelect.BackColor = System.Drawing.Color.SandyBrown;
             this.ReverseSelect.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.ReverseSelect.ForeColor = System.Drawing.SystemColors.HighlightText;
-            this.ReverseSelect.Location = new System.Drawing.Point(730, 375);
+            this.ReverseSelect.Location = new System.Drawing.Point(653, 375);
             this.ReverseSelect.Name = "ReverseSelect";
             this.ReverseSelect.Size = new System.Drawing.Size(58, 28);
             this.ReverseSelect.TabIndex = 13;
             this.ReverseSelect.Text = "反选";
             this.ReverseSelect.UseVisualStyleBackColor = false;
             this.ReverseSelect.Click += new System.EventHandler(this.ReverseSelect_Click);
-            // 
-            // Stop
-            // 
-            this.Stop.BackColor = System.Drawing.Color.DarkRed;
-            this.Stop.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.Stop.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(128)))));
-            this.Stop.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Aqua;
-            this.Stop.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.Stop.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.Stop.Location = new System.Drawing.Point(157, 109);
-            this.Stop.Margin = new System.Windows.Forms.Padding(4);
-            this.Stop.Name = "Stop";
-            this.Stop.Size = new System.Drawing.Size(67, 29);
-            this.Stop.TabIndex = 7;
-            this.Stop.Text = "停止";
-            this.Stop.UseVisualStyleBackColor = false;
-            this.Stop.Click += new System.EventHandler(this.Stop_Click);
             // 
             // TestProxy
             // 
@@ -257,10 +258,24 @@ namespace Bomber
             this.ProxyEnabled.Text = "使用";
             this.ProxyEnabled.UseVisualStyleBackColor = true;
             // 
+            // Refresh
+            // 
+            this.Refresh.BackColor = System.Drawing.Color.SandyBrown;
+            this.Refresh.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.Refresh.ForeColor = System.Drawing.SystemColors.HighlightText;
+            this.Refresh.Location = new System.Drawing.Point(717, 341);
+            this.Refresh.Name = "Refresh";
+            this.Refresh.Size = new System.Drawing.Size(58, 28);
+            this.Refresh.TabIndex = 16;
+            this.Refresh.Text = "刷新";
+            this.Refresh.UseVisualStyleBackColor = false;
+            this.Refresh.Click += new System.EventHandler(this.Refresh_Click);
+            // 
             // Main
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(800, 419);
+            this.Controls.Add(this.Refresh);
             this.Controls.Add(this.ProxyEnabled);
             this.Controls.Add(this.TestProxy);
             this.Controls.Add(this.ReverseSelect);
@@ -304,6 +319,7 @@ namespace Bomber
         private Button Stop;
         private Button TestProxy;
         private CheckBox ProxyEnabled;
+        private Button Refresh;
     }
 }
 
