@@ -59,6 +59,14 @@ namespace Bomber
                     return result;
                 }
 
+                string Copy(string str, int count)
+                {
+                    if (count > 0)
+                        return Copy(str + str, --count);
+                    else
+                        return str;
+                }
+
                 while ((line = sr.ReadLine()) != null)
                 {
                     if (line.StartsWith("def"))
@@ -98,11 +106,16 @@ namespace Bomber
                                 data = ConvertTo(groups2[1].Value);
 
                                 json = groups3[1].Value.Replace("'", "\"");
+
+                                int kCount = 0;
                                 int startCount = json.Count(c => c == '{'), endCount = json.Count(c => c == '}');
-                                if (endCount < startCount)
+                                while (endCount < startCount)
                                 {
-                                    for (int i = endCount; i < startCount; i++)
-                                        json += "}";
+                                    pattern3 = "json=({[^}]*}" + Copy("[^}]*}", kCount++) + ")";
+                                    groups3 = Regex.Match(input, pattern3).Groups;
+                                    json = groups3[1].Value.Replace("'", "\"");
+                                    startCount = json.Count(c => c == '{'); 
+                                    endCount = json.Count(c => c == '}');
                                 }
 
                                 delay = groups4[1].Value == "" ? 0f : Convert.ToSingle(groups4[1].Value);
@@ -114,13 +127,14 @@ namespace Bomber
                             }
 
                             var name = start.Split('(')[0].Substring(start.IndexOf(" ") + 1);
-                            var http = new Http();
-
-                            http.Method = method.ToUpper();
-                            http.Url = url;
-                            http.Headers = headers;
-                            http.Data = data != "" ? data : json;
-                            http.Delay = delay;
+                            var http = new Http
+                            {
+                                Method = method.ToUpper(),
+                                Url = url,
+                                Headers = headers,
+                                Data = data != "" ? data : json,
+                                Delay = delay
+                            };
 
                             Https[name] = http;
 
@@ -151,7 +165,7 @@ namespace Bomber
                 Bullets.Items.Add(http.Key, true);
             }
 
-            RefreshBullets.Text = String.Format("刷新({0})", Https.Count); 
+            RefreshBullets.Text = string.Format("刷新({0})", Https.Count); 
         }
 
         private void Main_Load(object sender, EventArgs e)
@@ -178,7 +192,7 @@ namespace Bomber
                     XmlElement proxies = root["Proxies"];
                     if (proxies != null)
                     {
-                        ProxyEnabled.Checked = proxies.GetAttribute("enabled") == "true" ? true : false;
+                        ProxyEnabled.Checked = proxies.GetAttribute("enabled") == "true";
                         foreach (XmlElement p in proxies)
                         {
                             ProxyValue.AppendText(p.GetAttribute("value") + "\n");
@@ -279,12 +293,14 @@ namespace Bomber
                 if (Bullets.GetItemChecked(i))
                 {
                     string key = (string)Bullets.Items[i];
-                    var http = new Http();
-                    http.Method = Https[key].Method;
-                    http.Url = Https[key].Url.Replace("+target+", phone).Replace("=target", "=" + phone);
-                    http.Headers = Https[key].Headers;
-                    http.Data = Https[key].Data.Replace("'+target+'", phone).Replace("target", phone);
-                    http.Delay = Https[key].Delay;
+                    var http = new Http
+                    {
+                        Method = Https[key].Method,
+                        Url = Https[key].Url.Replace("+target+", phone).Replace("=target", "=" + phone),
+                        Headers = Https[key].Headers,
+                        Data = Https[key].Data.Replace("'+target+'", phone).Replace("target", phone),
+                        Delay = Https[key].Delay
+                    };
                     https[key] = http;
                 }
             }
@@ -400,8 +416,10 @@ namespace Bomber
                     {
                         var request = (HttpWebRequest)WebRequest.Create("http://httpbin.org/ip");
 
-                        var proxy = new WebProxy(p);
-                        proxy.BypassProxyOnLocal = true;
+                        var proxy = new WebProxy(p)
+                        {
+                            BypassProxyOnLocal = true
+                        };
                         request.Proxy = proxy;
 
                         SetText("开始测试: " + p + "\n");
@@ -430,8 +448,10 @@ namespace Bomber
                     if (r != null)
                         r.Close();
                 }
-            });
-            th.Name = "TestProxy";
+            })
+            {
+                Name = "TestProxy"
+            };
             th.Start();
         }
 

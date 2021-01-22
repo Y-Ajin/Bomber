@@ -22,7 +22,7 @@ namespace Bomber
 
             try
             {
-                ServicePointManager.ServerCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
+                //ServicePointManager.ServerCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
 
                 var request = (HttpWebRequest)WebRequest.Create(http.Url);
 
@@ -30,8 +30,15 @@ namespace Bomber
                 request.CookieContainer = new CookieContainer();
                 request.AllowAutoRedirect = true;
                 request.Credentials = CredentialCache.DefaultCredentials;
+
                 if (proxy != null)
-                    request.Proxy = new WebProxy(proxy);
+                {
+                    var p = new WebProxy(proxy)
+                    {
+                        BypassProxyOnLocal = true
+                    };
+                    request.Proxy = p;
+                }
 
                 foreach (var h in http.Headers)
                 {
@@ -50,12 +57,22 @@ namespace Bomber
                     else if (h.Key.Equals("Cookie", StringComparison.CurrentCultureIgnoreCase))
                     {
                         var arrv = h.Value.Split(';');
+                        var container = new CookieContainer();
                         foreach (var v in arrv)
                         {
                             var name = v.Substring(0, v.IndexOf("=")).Trim();
                             var value = v.Substring(v.IndexOf("=") + 1).Trim();
-                            request.CookieContainer.Add(new Cookie(name, value, "/", request.Host));
+                            var cookie = new Cookie(name, value, "/", request.Host);
+                            try
+                            {
+                                container.Add(cookie);
+                            }
+                            catch
+                            {
+                                continue;
+                            }
                         }
+                        request.CookieContainer = container;
                     }
                     else
                         request.Headers.Set(h.Key, h.Value);
