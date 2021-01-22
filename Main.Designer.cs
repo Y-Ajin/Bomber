@@ -79,7 +79,7 @@ namespace Bomber
             this.TimesValue.Location = new System.Drawing.Point(87, 42);
             this.TimesValue.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.TimesValue.Name = "TimesValue";
-            this.TimesValue.Size = new System.Drawing.Size(121, 25);
+            this.TimesValue.Size = new System.Drawing.Size(121, 27);
             this.TimesValue.TabIndex = 3;
             this.TimesValue.Text = "3";
             // 
@@ -265,7 +265,7 @@ namespace Bomber
             this.RefreshBullets.ForeColor = System.Drawing.SystemColors.HighlightText;
             this.RefreshBullets.Location = new System.Drawing.Point(717, 341);
             this.RefreshBullets.Name = "RefreshBullets";
-            this.RefreshBullets.Size = new System.Drawing.Size(58, 28);
+            this.RefreshBullets.Size = new System.Drawing.Size(71, 62);
             this.RefreshBullets.TabIndex = 16;
             this.RefreshBullets.Text = "刷新";
             this.RefreshBullets.UseVisualStyleBackColor = false;
@@ -285,12 +285,13 @@ namespace Bomber
             this.Controls.Add(this.ProxyValue);
             this.Controls.Add(this.Proxy);
             this.Controls.Add(this.Data);
+            this.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = global::Bomber.Properties.Resources.Icon;
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.MaximizeBox = false;
             this.Name = "Main";
-            this.Text = "小小轰炸姬 v 1.0";
+            this.Text = "小小轰炸姬 v 1.1";
             this.Load += new System.EventHandler(this.Main_Load);
             this.Data.ResumeLayout(false);
             this.Data.PerformLayout();

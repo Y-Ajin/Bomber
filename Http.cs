@@ -22,7 +22,6 @@ namespace Bomber
 
             try
             {
-                Console.WriteLine(http.Url);
                 ServicePointManager.ServerCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
 
                 var request = (HttpWebRequest)WebRequest.Create(http.Url);
@@ -48,6 +47,16 @@ namespace Bomber
                         request.Accept = h.Value;
                     else if (h.Key.Equals("Referer", StringComparison.CurrentCultureIgnoreCase))
                         request.Referer = h.Value;
+                    else if (h.Key.Equals("Cookie", StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        var arrv = h.Value.Split(';');
+                        foreach (var v in arrv)
+                        {
+                            var name = v.Substring(0, v.IndexOf("=")).Trim();
+                            var value = v.Substring(v.IndexOf("=") + 1).Trim();
+                            request.CookieContainer.Add(new Cookie(name, value, "/", request.Host));
+                        }
+                    }
                     else
                         request.Headers.Set(h.Key, h.Value);
                 }

