@@ -18,7 +18,7 @@ namespace Bomber
     {
         delegate void SetTextCallback(string text);
 
-        private Dictionary<string, Http> Https;
+        private List<Http> Https;
         private bool breakLoop;
 
         public Main()
@@ -28,7 +28,7 @@ namespace Bomber
 
         private void LoadBullets()
         {
-            Https = new Dictionary<string, Http>();
+            Https = new List<Http>();
             using (StreamReader sr = new StreamReader("bullet_list.py"))
             {
                 string start = "";
@@ -122,13 +122,14 @@ namespace Bomber
 
                                 if (urlp != "")
                                 {
+                                    url = url.IndexOf("?") != -1 ? url.Substring(0, url.IndexOf("?")) : url;
                                     url += "?" + urlp;
                                 }
                             }
 
-                            var name = start.Split('(')[0].Substring(start.IndexOf(" ") + 1);
                             var http = new Http
                             {
+                                Name = start.Split('(')[0].Substring(start.IndexOf(" ") + 1),
                                 Method = method.ToUpper(),
                                 Url = url,
                                 Headers = headers,
@@ -136,7 +137,7 @@ namespace Bomber
                                 Delay = delay
                             };
 
-                            Https[name] = http;
+                            Https.Add(http);
 
                             start = "";
                             headers = new Dictionary<string, string>();
@@ -149,10 +150,13 @@ namespace Bomber
                         }
                         else
                         {
-                            if (line.Contains("headers") || line.Contains("''')"))
+                            if (!line.Contains(":")) 
                                 continue;
                             var key = line.Substring(0, line.IndexOf(":")).Trim();
-                            if (key == "Content-Length") continue;
+                            if (key.Contains(" ")) 
+                                continue;
+                            if (key == "Content-Length") 
+                                continue;
                             headers[key] = line.Substring(line.IndexOf(":") + 1).Trim();
                         }
                     }
@@ -160,12 +164,92 @@ namespace Bomber
             }
 
             Bullets.Items.Clear();
+
+            if (File.Exists("BulletsArray.xml"))
+            {
+                XmlDocument xmlDoc = new XmlDocument();
+                xmlDoc.Load("BulletsArray.xml");
+
+                XmlNode array = xmlDoc.FirstChild;
+                if (array == null)
+                {
+                    array = xmlDoc.CreateElement("Array");
+                    xmlDoc.AppendChild(array);
+                }
+
+                List<string> vNames = new List<string>();
+
+                foreach (XmlElement v in array)
+                {
+                    var index = Https.FindIndex(h => h.Name == v.GetAttribute("name"));
+                    if (index != -1)
+                    {
+                        var i = Convert.ToInt32(v.GetAttribute("index"));
+                        if (i < Https.Count)
+                        {
+                            var a = Https[i];
+                            Https[i] = Https[index];
+                            Https[index] = a;
+                        }
+                    }
+                    vNames.Add(v.GetAttribute("name"));
+                }
+
+                if (vNames.Count <= Https.Count)
+                {
+                    foreach (var http in Https.FindAll(h => !vNames.Contains(h.Name)))
+                    {
+                        XmlElement v = xmlDoc.CreateElement("Value");
+                        v.SetAttribute("index", Https.IndexOf(http).ToString());
+                        v.SetAttribute("name", http.Name);
+                        array.AppendChild(v);
+                    }
+
+                    xmlDoc.Save("BulletsArray.xml");
+                }
+                else
+                {
+                    SaveBulletsArray();
+                }
+            }
+            else
+            {
+                SaveBulletsArray();
+            }
+
             foreach (var http in Https)
             {
-                Bullets.Items.Add(http.Key, true);
+                Bullets.Items.Add(http.Name, true);
             }
 
             RefreshBullets.Text = string.Format("刷新({0})", Https.Count); 
+        }
+
+        private void UpdateBullets()
+        {
+            Bullets.Items.Clear();
+            foreach (var http in Https)
+            {
+                Bullets.Items.Add(http.Name, true);
+            }
+        }
+
+        private void SaveBulletsArray()
+        {
+            XmlDocument xmlDoc = new XmlDocument();
+            XmlNode array = xmlDoc.CreateElement("Array");
+
+            foreach (var http in Https)
+            {
+                XmlElement v = xmlDoc.CreateElement("Value");
+                v.SetAttribute("index", Https.IndexOf(http).ToString());
+                v.SetAttribute("name", http.Name);
+                array.AppendChild(v);
+            }
+
+            xmlDoc.AppendChild(array);
+
+            xmlDoc.Save("BulletsArray.xml");
         }
 
         private void Main_Load(object sender, EventArgs e)
@@ -293,13 +377,19 @@ namespace Bomber
                 if (Bullets.GetItemChecked(i))
                 {
                     string key = (string)Bullets.Items[i];
+                    var hp = Https.Find(h => h.Name == key);
                     var http = new Http
                     {
-                        Method = Https[key].Method,
-                        Url = Https[key].Url.Replace("+target+", phone).Replace("=target", "=" + phone),
-                        Headers = Https[key].Headers,
-                        Data = Https[key].Data.Replace("'+target+'", phone).Replace("target", phone),
-                        Delay = Https[key].Delay
+                        Method = hp.Method,
+                        Url = hp.Url.Replace(" ", "").Replace("+target", phone).
+                                             Replace("+", "").
+                                             Replace("=target", "=" + phone),
+                        Headers = hp.Headers,
+                        Data = hp.Data == "" ? "" : (!hp.Data.Contains("{") ? hp.Data.Replace("\"+target+\"", phone).Replace("target", phone) : 
+                                               hp.Data.Replace("\"+target+\"", phone).
+                                               Replace("\"target\"", "target").
+                                               Replace("target", "\"" + phone + "\"")),
+                        Delay = hp.Delay
                     };
                     https[key] = http;
                 }
@@ -327,7 +417,7 @@ namespace Bomber
                         if (breakLoop)
                         {
                             breakLoop = false;
-                            SetText(">> 停止循环...\n\n");
+                            SetText("\n>> 停止循环...\n\n");
                             return;
                         }
 
@@ -336,7 +426,7 @@ namespace Bomber
                         SetText("输出结果: " + r + "\n\n");
                         if (http.Value.Delay > 0f)
                         {
-                            SetText("请稍等...\n\n");
+                            SetText(">> 请稍等...\n\n");
                             Thread.Sleep((int)(http.Value.Delay * 1000f));
                         }
                     }
@@ -426,7 +516,6 @@ namespace Bomber
 
                         try
                         {
-
                             response = request.GetResponse();
                             r = new StreamReader(response.GetResponseStream(), Encoding.UTF8);
                             SetText("测试结果: " + r.ReadToEnd() + "\n\n");
@@ -458,6 +547,55 @@ namespace Bomber
         private void RefreshBullets_Click(object sender, EventArgs e)
         {
             LoadBullets();
+        }
+
+        private void SearchValue_TextChanged(object sender, EventArgs e)
+        {
+            if (SearchValue.TextLength > 0)
+            {
+                Bullets.Items.Clear();
+                foreach (var http in Https)
+                {
+                    if (http.Name.ToLower().Contains(SearchValue.Text.ToLower()))
+                        Bullets.Items.Add(http.Name, true);
+                }
+            }
+            else
+            {
+                UpdateBullets();
+            }
+        }
+
+        private void BulletMoveUp_Click(object sender, EventArgs e)
+        {
+            var i = Bullets.SelectedIndex;
+            if (i == -1)
+                i = 0;
+            if (i - 1 >= 0)
+            {
+                var a = Https[i - 1];
+                Https[i - 1] = Https[i];
+                Https[i] = a;
+                UpdateBullets();
+                Bullets.SetSelected(i - 1, true);
+                SaveBulletsArray();
+            }
+        }
+
+        private void BulletMoveDown_Click(object sender, EventArgs e)
+        {
+            var i = Bullets.SelectedIndex;
+            if (i == -1)
+                i = 0;
+            if (i + 1 < Bullets.Items.Count)
+            {
+                var a = Https[i + 1];
+                Https[i + 1] = Https[i];
+                Https[i] = a;
+                UpdateBullets();
+                Bullets.SetSelected(i + 1, true);
+                SaveBulletsArray();
+            }
         }
     }
 }

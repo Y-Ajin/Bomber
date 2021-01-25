@@ -8,6 +8,7 @@ namespace Bomber
 {
     public class Http
     {
+        public string Name { get; set; }
         public string Method { get; set; }
         public string Url { get; set; }
         public Dictionary<string, string> Headers { get; set; }
@@ -22,14 +23,26 @@ namespace Bomber
 
             try
             {
-                //ServicePointManager.ServerCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
+                HttpWebRequest request = null;
 
-                var request = (HttpWebRequest)WebRequest.Create(http.Url);
+                if (http.Url.StartsWith("https", StringComparison.OrdinalIgnoreCase)) // https请求
+                {
+                    ServicePointManager.Expect100Continue = true;
+                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 
+                                                         | SecurityProtocolType.Tls
+                                                         | SecurityProtocolType.Tls11
+                                                         | SecurityProtocolType.Tls12;
+                    ServicePointManager.ServerCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
+                    request = (HttpWebRequest)WebRequest.Create(http.Url);
+                    request.ProtocolVersion = HttpVersion.Version10;
+                }
+                else
+                    request = (HttpWebRequest)WebRequest.Create(http.Url);
 
-                request.Method = http.Method;
                 request.CookieContainer = new CookieContainer();
                 request.AllowAutoRedirect = true;
                 request.Credentials = CredentialCache.DefaultCredentials;
+                request.Method = http.Method;
 
                 if (proxy != null)
                 {

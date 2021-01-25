@@ -52,6 +52,10 @@ namespace Bomber
             this.TestProxy = new System.Windows.Forms.Button();
             this.ProxyEnabled = new System.Windows.Forms.CheckBox();
             this.RefreshBullets = new System.Windows.Forms.Button();
+            this.SearchValue = new System.Windows.Forms.TextBox();
+            this.Search = new System.Windows.Forms.Label();
+            this.BulletMoveUp = new System.Windows.Forms.Button();
+            this.BulletMoveDown = new System.Windows.Forms.Button();
             this.Data.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -115,6 +119,7 @@ namespace Bomber
             // 
             // Data
             // 
+            this.Data.BackColor = System.Drawing.SystemColors.AppWorkspace;
             this.Data.Controls.Add(this.Stop);
             this.Data.Controls.Add(this.Start);
             this.Data.Controls.Add(this.Phone);
@@ -193,7 +198,7 @@ namespace Bomber
             this.Output.Margin = new System.Windows.Forms.Padding(4);
             this.Output.Name = "Output";
             this.Output.ReadOnly = true;
-            this.Output.Size = new System.Drawing.Size(386, 389);
+            this.Output.Size = new System.Drawing.Size(365, 389);
             this.Output.TabIndex = 10;
             this.Output.Text = "";
             // 
@@ -203,9 +208,9 @@ namespace Bomber
             this.Bullets.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.Bullets.ForeColor = System.Drawing.SystemColors.HighlightText;
             this.Bullets.FormattingEnabled = true;
-            this.Bullets.Location = new System.Drawing.Point(653, 13);
+            this.Bullets.Location = new System.Drawing.Point(667, 12);
             this.Bullets.Name = "Bullets";
-            this.Bullets.Size = new System.Drawing.Size(135, 312);
+            this.Bullets.Size = new System.Drawing.Size(121, 290);
             this.Bullets.TabIndex = 11;
             // 
             // AllSelect
@@ -213,7 +218,7 @@ namespace Bomber
             this.AllSelect.BackColor = System.Drawing.Color.SandyBrown;
             this.AllSelect.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.AllSelect.ForeColor = System.Drawing.SystemColors.HighlightText;
-            this.AllSelect.Location = new System.Drawing.Point(653, 341);
+            this.AllSelect.Location = new System.Drawing.Point(653, 349);
             this.AllSelect.Name = "AllSelect";
             this.AllSelect.Size = new System.Drawing.Size(58, 28);
             this.AllSelect.TabIndex = 12;
@@ -263,18 +268,69 @@ namespace Bomber
             this.RefreshBullets.BackColor = System.Drawing.Color.SandyBrown;
             this.RefreshBullets.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.RefreshBullets.ForeColor = System.Drawing.SystemColors.HighlightText;
-            this.RefreshBullets.Location = new System.Drawing.Point(717, 341);
+            this.RefreshBullets.Location = new System.Drawing.Point(717, 349);
             this.RefreshBullets.Name = "RefreshBullets";
-            this.RefreshBullets.Size = new System.Drawing.Size(71, 62);
+            this.RefreshBullets.Size = new System.Drawing.Size(71, 54);
             this.RefreshBullets.TabIndex = 16;
             this.RefreshBullets.Text = "刷新";
             this.RefreshBullets.UseVisualStyleBackColor = false;
             this.RefreshBullets.Click += new System.EventHandler(this.RefreshBullets_Click);
             // 
+            // SearchValue
+            // 
+            this.SearchValue.Location = new System.Drawing.Point(698, 316);
+            this.SearchValue.Name = "SearchValue";
+            this.SearchValue.Size = new System.Drawing.Size(90, 27);
+            this.SearchValue.TabIndex = 17;
+            this.SearchValue.TextChanged += new System.EventHandler(this.SearchValue_TextChanged);
+            // 
+            // Search
+            // 
+            this.Search.AutoSize = true;
+            this.Search.BackColor = System.Drawing.Color.LimeGreen;
+            this.Search.ForeColor = System.Drawing.SystemColors.HighlightText;
+            this.Search.Location = new System.Drawing.Point(653, 319);
+            this.Search.Name = "Search";
+            this.Search.Size = new System.Drawing.Size(39, 20);
+            this.Search.TabIndex = 18;
+            this.Search.Text = "搜索";
+            // 
+            // BulletMoveUp
+            // 
+            this.BulletMoveUp.BackColor = System.Drawing.SystemColors.HotTrack;
+            this.BulletMoveUp.FlatAppearance.BorderColor = System.Drawing.Color.White;
+            this.BulletMoveUp.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.BulletMoveUp.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.BulletMoveUp.Location = new System.Drawing.Point(640, 93);
+            this.BulletMoveUp.Name = "BulletMoveUp";
+            this.BulletMoveUp.Size = new System.Drawing.Size(21, 54);
+            this.BulletMoveUp.TabIndex = 19;
+            this.BulletMoveUp.Text = "上移";
+            this.BulletMoveUp.UseVisualStyleBackColor = false;
+            this.BulletMoveUp.Click += new System.EventHandler(this.BulletMoveUp_Click);
+            // 
+            // BulletMoveDown
+            // 
+            this.BulletMoveDown.BackColor = System.Drawing.SystemColors.HotTrack;
+            this.BulletMoveDown.FlatAppearance.BorderColor = System.Drawing.Color.White;
+            this.BulletMoveDown.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.BulletMoveDown.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.BulletMoveDown.Location = new System.Drawing.Point(640, 158);
+            this.BulletMoveDown.Name = "BulletMoveDown";
+            this.BulletMoveDown.Size = new System.Drawing.Size(21, 54);
+            this.BulletMoveDown.TabIndex = 20;
+            this.BulletMoveDown.Text = "下移";
+            this.BulletMoveDown.UseVisualStyleBackColor = false;
+            this.BulletMoveDown.Click += new System.EventHandler(this.BulletMoveDown_Click);
+            // 
             // Main
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(800, 419);
+            this.Controls.Add(this.BulletMoveDown);
+            this.Controls.Add(this.BulletMoveUp);
+            this.Controls.Add(this.Search);
+            this.Controls.Add(this.SearchValue);
             this.Controls.Add(this.RefreshBullets);
             this.Controls.Add(this.ProxyEnabled);
             this.Controls.Add(this.TestProxy);
@@ -321,6 +377,10 @@ namespace Bomber
         private Button TestProxy;
         private CheckBox ProxyEnabled;
         private Button RefreshBullets;
+        private TextBox SearchValue;
+        private Label Search;
+        private Button BulletMoveUp;
+        private Button BulletMoveDown;
     }
 }
 
