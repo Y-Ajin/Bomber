@@ -43,6 +43,8 @@ namespace Bomber
 
                 string ConvertTo(string str)
                 {
+                    if (!str.StartsWith("{")) 
+                        return str.Replace("'", "\"");
                     string result = "";
                     str = str.Replace("{", "").Replace("}", "").Replace("'", "\"");
                     var parr = str.Split(',');
@@ -95,12 +97,19 @@ namespace Bomber
                                 var input = arr[4].Replace(")", "").Trim();
                                 var pattern1 = "params=({[^}]*})";
                                 var pattern2 = "data=({[^}]*})";
+                                var pattern22 = "data='(.*)'";
+                                var pattern222 = "data=\"(.*)\"";
                                 var pattern3 = "json=({[^}]*})";
                                 var pattern4 = "delay=([0-9.]+)";
                                 var groups1 = Regex.Match(input, pattern1).Groups;
                                 var groups2 = Regex.Match(input, pattern2).Groups;
                                 var groups3 = Regex.Match(input, pattern3).Groups;
                                 var groups4 = Regex.Match(input, pattern4).Groups;
+
+                                if (!groups2[1].Success)
+                                    groups2 = Regex.Match(input, pattern22).Groups;
+                                if (!groups2[1].Success)
+                                    groups2 = Regex.Match(input, pattern222).Groups;
 
                                 urlp = ConvertTo(groups1[1].Value);
                                 data = ConvertTo(groups2[1].Value);
@@ -391,6 +400,7 @@ namespace Bomber
                                                Replace("target", "\"" + phone + "\"")),
                         Delay = hp.Delay
                     };
+                    Console.WriteLine(http.Data);
                     https[key] = http;
                 }
             }
